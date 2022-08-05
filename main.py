@@ -54,33 +54,25 @@ def changeAnalyzer(event):
 
 def change_state(event):
     if event == 0:
-        analyzer_state_switch()
+        analyzer_state_switch(True)
+    elif event == 1:
+        analyzer_state_switch(False)
     else:
         pass
 
 
-def analyzer_state_switch():
-    if analyzer_label.winfo_viewable():
-        analyzer_label.pack_forget()
-        analyzer_name_entry.pack_forget()
-        analyzer_reading_entry.pack_forget()
-        analyzer_recording1_entry.pack_forget()
-        analyzer_recording2_entry.pack_forget()
-        analyzer_submit_button.pack_forget()
-        finalize_button.pack_forget()
-        analyzer_label.pack_forget()
-        analyzer_menu.pack_forget()
+# Controls the analyzer page
+def analyzer_state_switch(state):
+    if state:
+        for item in analyzer_page:
+            item.pack_forget()
     else:
-        analyzer_label.pack()
-        analyzer_name_entry.pack()
-        analyzer_reading_entry.pack()
-        analyzer_recording1_entry.pack()
-        analyzer_recording2_entry.pack()
-        analyzer_submit_button.pack()
-        finalize_button.pack()
-        analyzer_label.pack()
-        analyzer_menu.pack()
+        for item in analyzer_page:
+            item.pack()
 
+def uv_state_switch(state):
+    if state:
+        pass
 
 # Generation of the GUI for the water plant
 window = tk.Tk()
@@ -96,7 +88,7 @@ nav_menu.add_command(
 )
 nav_menu.add_command(
     label="Analyzer Readings",
-    command=lambda: change_state(0)
+    command=lambda: change_state(1)
 )
 nav_menu.add_command(
     label="Recordings Information",
@@ -149,6 +141,23 @@ plant_analyzers_var.set(PLANT_ANALYZERS[0])
 
 analyzer_menu = tk.OptionMenu(window, plant_analyzers_var, *PLANT_ANALYZERS, command=changeAnalyzer)
 analyzer_menu.pack()
+
+# Container of all analyzer page elements
+analyzer_page = [
+    analyzer_label,
+    analyzer_name_entry,
+    analyzer_reading_entry,
+    analyzer_recording1_entry,
+    analyzer_recording2_entry,
+    analyzer_submit_button,
+    finalize_button,
+    analyzer_label,
+    analyzer_menu
+]
+
+uv_page = [
+    
+]
 
 
 # Press the green button in the gutter to run the script.
