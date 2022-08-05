@@ -52,27 +52,27 @@ def changeAnalyzer(event):
     analyzer_name_entry.config(state="readonly")
 
 
+# Command that changes the states upon button press
 def change_state(event):
     if event == 0:
-        analyzer_state_switch(True)
+        state_switch(True, analyzer_page)
+        state_switch(False, uv_page)
     elif event == 1:
-        analyzer_state_switch(False)
+        state_switch(True, uv_page)
+        state_switch(False, analyzer_page)
     else:
         pass
 
 
-# Controls the analyzer page
-def analyzer_state_switch(state):
+# Controls the state of the required page
+def state_switch(state, page):
     if state:
-        for item in analyzer_page:
+        for item in page:
             item.pack_forget()
     else:
-        for item in analyzer_page:
+        for item in page:
             item.pack()
 
-def uv_state_switch(state):
-    if state:
-        pass
 
 # Generation of the GUI for the water plant
 window = tk.Tk()
@@ -156,7 +156,7 @@ analyzer_page = [
 ]
 
 uv_page = [
-    
+
 ]
 
 
