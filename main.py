@@ -22,18 +22,20 @@ GUI_STATE = [
 def submit_analyzers():
     plant_file.close()
 
-    finalize_button.config(state="disabled", text="Outputting...")
-    analyzer_submit_button.config(state="disabled")
+    if finalize_button:
+        finalize_button.config(state="disabled", text="Outputting...")
+        analyzer_submit_button.config(state="disabled")
 
     window.update()
-
     time.sleep(1)
+
+    exhausted_push()
 
     change_state(2)
 
 
 # Method to write information inputted by user
-def write_analyzer():
+def write_analyzer(menu):
     current_time = datetime.datetime.now()
 
     analyzer_info = [analyzer_name_entry, analyzer_reading_entry, analyzer_recording1_entry,
@@ -47,7 +49,29 @@ def write_analyzer():
     for info in analyzer_info:
         info.delete(0, tk.END)
 
+    for item in PLANT_ANALYZERS:
+        if item == analyzer_name_entry.get():
+            analyzer_menu['menu'].delete(item)
+            PLANT_ANALYZERS.remove(item)
 
+    if len(PLANT_ANALYZERS) > 0:
+        plant_analyzers_var.set(PLANT_ANALYZERS[0])
+        change_analyzer(0)
+    else:
+        exhausted_push()
+
+    change_state(1)
+
+
+# Clears out button for pushing, and analyzer menu
+def exhausted_push():
+    analyzer_submit_button.destroy()
+    analyzer_menu.destroy()
+    analyzer_page.remove(analyzer_submit_button)
+    analyzer_page.remove(analyzer_menu)
+
+
+# configures analyzer to change
 def change_analyzer(event):
     analyzer_name_entry.config(state="normal")
     analyzer_name_entry.delete(0, tk.END)
@@ -160,16 +184,16 @@ analyzer_reading_entry.bind('<FocusIn>', lambda x: analyzer_reading_entry.select
 analyzer_reading_entry.pack()
 
 analyzer_recording1_entry = tk.Entry(selectborderwidth=2, width=30, justify='center')
-analyzer_recording1_entry.insert(0, "Enter first recording reading.")
+analyzer_recording1_entry.insert(0, "Enter first residual.")
 analyzer_recording1_entry.bind('<FocusIn>', lambda x: analyzer_recording1_entry.selection_range(0, tk.END))
 analyzer_recording1_entry.pack()
 
 analyzer_recording2_entry = tk.Entry(selectborderwidth=2, width=30, justify="center")
-analyzer_recording2_entry.insert(0, "Enter second recording reading.")
+analyzer_recording2_entry.insert(0, "Enter second residual.")
 analyzer_recording2_entry.bind('<FocusIn>', lambda x: analyzer_recording2_entry.selection_range(0, tk.END))
 analyzer_recording2_entry.pack()
 
-analyzer_submit_button = tk.Button(text="Push Analyzer", command=write_analyzer)
+analyzer_submit_button = tk.Button(text="Push Analyzer", command=lambda: write_analyzer(analyzer_menu))
 analyzer_submit_button.pack()
 
 finalize_button = tk.Button(text="Finalize", command=submit_analyzers)
