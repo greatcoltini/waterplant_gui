@@ -1,8 +1,8 @@
 import datetime
 import tkinter as tk
 from tkinter import ttk
-import os
 import time
+import re
 
 plant_file = open("plant_database.pf", "w")
 
@@ -36,39 +36,103 @@ def submit_analyzers():
 
 # Method to write information inputted by user
 def write_analyzer(menu):
-    current_time = datetime.datetime.now()
+
+    # check for proper usage of entries
+    proper_entry = True
 
     analyzer_info = [analyzer_name_entry, analyzer_reading_entry, analyzer_recording1_entry,
                      analyzer_recording2_entry]
-    analyzer_string = ""
-    analyzer_string += str(current_time.year) + "/" + str(current_time.month) + "/" + str(current_time.day) + "\t"
-    for info in analyzer_info:
-        analyzer_string += info.get() + "\t"
-    plant_file.write(analyzer_string + "\n")
 
-    for info in analyzer_info:
-        info.delete(0, tk.END)
+    counter = 0
+    for entry in analyzer_info:
+        if counter > 0:
+            if re.match("^\d\.\d{2}$", entry.get()):
+                pass
+            else:
+                entry.delete(0, tk.END)
+                entry.insert(0, "Must be of the form: #.## | 1.23")
+                proper_entry = False
+        counter += 1
 
-    for item in PLANT_ANALYZERS:
-        if item == analyzer_name_entry.get():
-            analyzer_menu['menu'].delete(item)
-            PLANT_ANALYZERS.remove(item)
+    if proper_entry:
+        analyzer_string = ""
+        analyzer_string += get_time()
+        for info in analyzer_info:
+            analyzer_string += info.get() + "\t"
+        plant_file.write(analyzer_string + "\n")
 
-    if len(PLANT_ANALYZERS) > 0:
-        plant_analyzers_var.set(PLANT_ANALYZERS[0])
-        change_analyzer(0)
+        for info in analyzer_info:
+            info.delete(0, tk.END)
+
+        for item in PLANT_ANALYZERS:
+            if item == analyzer_name_entry.get():
+                analyzer_menu['menu'].delete(item)
+                PLANT_ANALYZERS.remove(item)
+
+        if len(PLANT_ANALYZERS) > 0:
+            plant_analyzers_var.set(PLANT_ANALYZERS[0])
+            change_analyzer(0)
+        else:
+            exhausted_push()
+        finalize_button.config(state="active")
+
+        change_state(1)
     else:
-        exhausted_push()
+        pass
 
-    change_state(1)
+
+# function to call for submission of residual to file.
+def submit_residual():
+    # variable initialization
+    proper_date = True
+    proper_value = True
+    current_time = datetime.datetime.now()
+    residual_info = [residual_location_entry, residual_time_entry, residual_value_entry]
+    residual_file = open("residuals.txt", 'a')
+
+    # regex for time and value
+    if not re.match("^\d\d:\d\d$", residual_time_entry.get()):
+        proper_date = False
+        residual_time_entry.delete(0, tk.END)
+        residual_time_entry.insert(0, "Must be hh:mm...")
+
+    if not re.match("^\d\.\d{2}$", residual_value_entry.get()):
+        proper_value = False
+        residual_value_entry.delete(0, tk.END)
+        residual_value_entry.insert(0, "Must be #.##")
+
+    if proper_date and proper_value:
+        residual_string = ""
+        residual_string += get_time()
+        for item in residual_info:
+            residual_string += item.get() + "\t"
+        residual_file.write(residual_string + "\n")
+
+        for item in residual_info:
+            item.delete(0, tk.END)
+    else:
+        pass
+
+
+# display previous residuals
+def previous_residuals():
+    pass
+
+
+# get time and return it in format for writing
+def get_time():
+    current_time = datetime.datetime.now()
+    return str(current_time.year) + "/" + str(current_time.month) + "/" + str(current_time.day) + "\t"
 
 
 # Clears out button for pushing, and analyzer menu
 def exhausted_push():
-    analyzer_submit_button.destroy()
-    analyzer_menu.destroy()
-    analyzer_page.remove(analyzer_submit_button)
-    analyzer_page.remove(analyzer_menu)
+    for item in analyzer_page:
+        if item == display_previous_recordings:
+            pass
+        else:
+            item.destroy()
+            analyzer_page.remove(item)
 
 
 # configures analyzer to change
@@ -141,6 +205,7 @@ def table_generation():
 window = tk.Tk()
 window.title("Water Plant GUI")
 window.geometry('480x360')
+window.grid_columnconfigure((0,1), weight=1)
 
 nav_menu = tk.Menu(window)
 window.config(menu=nav_menu)
@@ -154,8 +219,8 @@ nav_menu.add_command(
     command=lambda: change_state(1)
 )
 nav_menu.add_command(
-    label="Recordings Information",
-    command=lambda: change_state(0)
+    label="Residual Information",
+    command=lambda: change_state(3)
 )
 nav_menu.add_command(
     label="Help",
@@ -196,7 +261,7 @@ analyzer_recording2_entry.pack()
 analyzer_submit_button = tk.Button(text="Push Analyzer", command=lambda: write_analyzer(analyzer_menu))
 analyzer_submit_button.pack()
 
-finalize_button = tk.Button(text="Finalize", command=submit_analyzers)
+finalize_button = tk.Button(text="Finalize", command=submit_analyzers, state="disabled")
 finalize_button.pack()
 
 plant_analyzers_var = tk.StringVar()
@@ -211,9 +276,22 @@ display_previous_recordings.pack()
 
 # components for analyzer history page
 analyzer_table = ttk.Treeview(window)
-
-
 back_button = tk.Button(text="Back", command=lambda: change_state(1))
+
+# components for residual page
+residual_label = tk.Label(text="Enter Residuals Here")
+residual_location_entry = tk.Entry(window, selectborderwidth=2, width=30, justify="center")
+residual_location_label = tk.Label(window, text="Location:")
+residual_time_entry = tk.Entry(window, selectborderwidth=2, width=30, justify="center")
+residual_time_label = tk.Label(window, text="Time:")
+residual_value_entry = tk.Entry(window, selectborderwidth=2, width=30, justify="center")
+residual_value_label = tk.Label(window, text="Residual:")
+residual_push_button = tk.Button(text="Submit Residual", command=lambda: submit_residual())
+previous_residual_button = tk.Button(text="Previous Residuals", command=lambda: previous_residuals())
+
+
+# components for residual history page
+residual_table = ttk.Treeview(window)
 
 # Container of all analyzer page elements
 analyzer_page = [
@@ -238,11 +316,24 @@ uv_page = [
 
 ]
 
+residuals_page = [
+    residual_label,
+    residual_location_label,
+    residual_location_entry,
+    residual_time_label,
+    residual_time_entry,
+    residual_value_label,
+    residual_value_entry,
+    residual_push_button,
+    previous_residual_button
+]
+
 # container of all containers
 pages = [
     uv_page,
     analyzer_page,
-    analyzer_previous_page
+    analyzer_previous_page,
+    residuals_page
 ]
 
 
