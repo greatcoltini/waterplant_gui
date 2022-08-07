@@ -18,6 +18,15 @@ GUI_STATE = [
 ]
 
 
+# Function to determine if we have done our daily analyzer checks yet..
+# TODO change this to half a day ?
+def determine_analyzers():
+    time = get_time()
+
+    for analyzer in PLANT_ANALYZERS:
+        pass
+
+
 # Submit the analyzer information to a file
 def submit_analyzers():
     plant_file.close()
@@ -64,21 +73,27 @@ def write_analyzer(menu):
         for info in analyzer_info:
             info.delete(0, tk.END)
 
-        for item in PLANT_ANALYZERS:
-            if item == analyzer_name_entry.get():
-                analyzer_menu['menu'].delete(item)
-                PLANT_ANALYZERS.remove(item)
+        delete_analyzer(analyzer_name_entry.get())
 
-        if len(PLANT_ANALYZERS) > 0:
-            plant_analyzers_var.set(PLANT_ANALYZERS[0])
-            change_analyzer(0)
-        else:
-            exhausted_push()
         finalize_button.config(state="active")
 
         change_state(1)
     else:
         pass
+
+
+# Delete analyzer function
+def delete_analyzer(analyzer):
+    for item in PLANT_ANALYZERS:
+        if item == analyzer:
+            analyzer_menu['menu'].delete(item)
+            PLANT_ANALYZERS.remove(item)
+    if len(PLANT_ANALYZERS) > 0:
+        plant_analyzers_var.set(PLANT_ANALYZERS[0])
+        change_analyzer(0)
+    else:
+        exhausted_push()
+
 
 
 # function to call for submission of residual to file.
@@ -128,7 +143,7 @@ def get_time():
 # Clears out button for pushing, and analyzer menu
 def exhausted_push():
     for item in analyzer_page:
-        if item == display_previous_recordings:
+        if item == display_previous_recordings or item == finalize_button:
             pass
         else:
             item.destroy()
@@ -161,7 +176,6 @@ def state_switch(state, page):
     else:
         for item in page:
             item.pack()
-
 
 # Table generation
 # OPENS THE GENERATED PLANT FILE FOR ANALYZERS
@@ -279,15 +293,16 @@ analyzer_table = ttk.Treeview(window)
 back_button = tk.Button(text="Back", command=lambda: change_state(1))
 
 # components for residual page
-residual_label = tk.Label(text="Enter Residuals Here")
-residual_location_entry = tk.Entry(window, selectborderwidth=2, width=30, justify="center")
-residual_location_label = tk.Label(window, text="Location:")
-residual_time_entry = tk.Entry(window, selectborderwidth=2, width=30, justify="center")
-residual_time_label = tk.Label(window, text="Time:")
-residual_value_entry = tk.Entry(window, selectborderwidth=2, width=30, justify="center")
-residual_value_label = tk.Label(window, text="Residual:")
-residual_push_button = tk.Button(text="Submit Residual", command=lambda: submit_residual())
-previous_residual_button = tk.Button(text="Previous Residuals", command=lambda: previous_residuals())
+residuals_frame = tk.Frame(window)
+residual_label = tk.Label(residuals_frame, text="Enter Residuals Here")
+residual_location_entry = tk.Entry(residuals_frame, selectborderwidth=2, width=30, justify="center")
+residual_location_label = tk.Label(residuals_frame, text="Location:")
+residual_time_entry = tk.Entry(residuals_frame, selectborderwidth=2, width=30, justify="center")
+residual_time_label = tk.Label(residuals_frame, text="Time:")
+residual_value_entry = tk.Entry(residuals_frame, selectborderwidth=2, width=30, justify="center")
+residual_value_label = tk.Label(residuals_frame, text="Residual:")
+residual_push_button = tk.Button(residuals_frame, text="Submit Residual", command=lambda: submit_residual())
+previous_residual_button = tk.Button(residuals_frame, text="Residuals Table", command=lambda: previous_residuals())
 
 
 # components for residual history page
@@ -317,6 +332,7 @@ uv_page = [
 ]
 
 residuals_page = [
+    residuals_frame,
     residual_label,
     residual_location_label,
     residual_location_entry,
@@ -327,6 +343,7 @@ residuals_page = [
     residual_push_button,
     previous_residual_button
 ]
+
 
 # container of all containers
 pages = [
