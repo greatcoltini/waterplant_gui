@@ -4,7 +4,7 @@ from tkinter import ttk
 import time
 import re
 
-plant_file = open("plant_database.pf", "w")
+plant_file = open("plant_database.pf", "a")
 
 PLANT_ANALYZERS = [
     "UV-AIT3",
@@ -21,11 +21,21 @@ GUI_STATE = [
 # Function to determine if we have done our daily analyzer checks yet..
 # TODO change this to half a day ?
 def determine_analyzers():
-    time = get_time()
+    current_time = get_time()
 
     for analyzer in PLANT_ANALYZERS:
-        pass
+        reading_file = open("plant_database.pf", "r")
+        for line in reading_file:
+            individual_lines = line.split("\t")
+            analyzer_in_database = individual_lines[1]
+            analyzer_date = individual_lines[0]
+            print(analyzer_date + ":" + current_time[:-1] + ":" + analyzer)
 
+            # if date is equal to current date, remove analyzer option
+            if analyzer_date == current_time[:-1] and analyzer_in_database == analyzer:
+                delete_analyzer(analyzer)
+
+    print(PLANT_ANALYZERS)
 
 # Submit the analyzer information to a file
 def submit_analyzers():
@@ -101,7 +111,6 @@ def submit_residual():
     # variable initialization
     proper_date = True
     proper_value = True
-    current_time = datetime.datetime.now()
     residual_info = [residual_location_entry, residual_time_entry, residual_value_entry]
     residual_file = open("residuals.txt", 'a')
 
@@ -138,6 +147,7 @@ def previous_residuals():
 def get_time():
     current_time = datetime.datetime.now()
     return str(current_time.year) + "/" + str(current_time.month) + "/" + str(current_time.day) + "\t"
+
 
 
 # Clears out button for pushing, and analyzer menu
@@ -356,5 +366,7 @@ pages = [
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
+    determine_analyzers()
     window.mainloop()
+
 
