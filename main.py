@@ -23,7 +23,7 @@ GUI_STATE = [
 def determine_analyzers():
     current_time = get_time()
 
-    for analyzer in PLANT_ANALYZERS:
+    for analyzer in PLANT_ANALYZERS[:]:
         reading_file = open("plant_database.pf", "r")
         for line in reading_file:
             individual_lines = line.split("\t")
@@ -34,8 +34,10 @@ def determine_analyzers():
             # if date is equal to current date, remove analyzer option
             if analyzer_date == current_time[:-1] and analyzer_in_database == analyzer:
                 delete_analyzer(analyzer)
-
-    print(PLANT_ANALYZERS)
+    if not PLANT_ANALYZERS:
+        finalize_button.destroy()
+        analyzer_page.remove(finalize_button)
+        exhausted_push()
 
 # Submit the analyzer information to a file
 def submit_analyzers():
@@ -149,11 +151,11 @@ def get_time():
     return str(current_time.year) + "/" + str(current_time.month) + "/" + str(current_time.day) + "\t"
 
 
-
 # Clears out button for pushing, and analyzer menu
 def exhausted_push():
-    for item in analyzer_page:
-        if item == display_previous_recordings or item == finalize_button:
+    analyzer_label.config(text="All analyzers entered for the day.", height=10, borderwidth=4, relief="groove")
+    for item in analyzer_page[:]:
+        if item == display_previous_recordings or item == finalize_button or item == analyzer_label:
             pass
         else:
             item.destroy()
