@@ -17,6 +17,8 @@ GUI_STATE = [
     "uv"
 ]
 
+CURRENT_STATE = 0;
+
 
 # Function to determine if we have done our daily analyzer checks yet..
 # TODO change this to half a day ?
@@ -38,6 +40,7 @@ def determine_analyzers():
         finalize_button.destroy()
         analyzer_page.remove(finalize_button)
         exhausted_push()
+
 
 # Submit the analyzer information to a file
 def submit_analyzers():
@@ -107,7 +110,6 @@ def delete_analyzer(analyzer):
         exhausted_push()
 
 
-
 # function to call for submission of residual to file.
 def submit_residual():
     # variable initialization
@@ -170,11 +172,16 @@ def change_analyzer(event):
     analyzer_name_entry.config(state="readonly")
 
 
+# Reverts the state when the back button is pressed
+def back_button():
+    if pages
+
 # Command that changes the states upon button press
 def change_state(event):
     for page in pages:
         state_switch(True, page)
     state_switch(False, pages[event])
+    CURRENT_STATE = pages[event]
 
     if event == 2:
         table_generation()
@@ -314,7 +321,7 @@ residual_time_label = tk.Label(residuals_frame, text="Time:")
 residual_value_entry = tk.Entry(residuals_frame, selectborderwidth=2, width=30, justify="center")
 residual_value_label = tk.Label(residuals_frame, text="Residual:")
 residual_push_button = tk.Button(residuals_frame, text="Submit Residual", command=lambda: submit_residual())
-previous_residual_button = tk.Button(residuals_frame, text="Residuals Table", command=lambda: previous_residuals())
+previous_residual_button = tk.Button(residuals_frame, text="Residuals Table", command=lambda: change_state(4))
 
 
 # components for residual history page
@@ -356,13 +363,18 @@ residuals_page = [
     previous_residual_button
 ]
 
+previous_residuals_page = [
+    back_button
+]
+
 
 # container of all containers
 pages = [
     uv_page,
     analyzer_page,
     analyzer_previous_page,
-    residuals_page
+    residuals_page,
+    previous_residuals_page
 ]
 
 
