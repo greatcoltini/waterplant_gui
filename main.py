@@ -47,6 +47,7 @@ def determine_analyzers():
         main_residual_btn_text = "Daily Analyzers Done: (" + str(counter) + "/3)"
         main_residual_btn.config(text=main_residual_btn_text, state="enabled", command=lambda: change_state(1))
 
+
 # Submit the analyzer information to a file
 def submit_analyzers():
     plant_file.close()
@@ -198,7 +199,6 @@ def change_state(event):
         table_generation()
 
 
-
 # Controls the state of the required page
 def state_switch(state, page):
     if state:
@@ -207,6 +207,13 @@ def state_switch(state, page):
     else:
         for item in page:
             item.pack()
+
+
+def daily_completed():
+    if PLANT_ANALYZERS:
+        counter = 3 - len(PLANT_ANALYZERS)
+        main_residual_btn_text = "Daily Analyzers Done: (" + str(counter) + "/3)"
+        main_residual_btn.config(text=main_residual_btn_text)
 
 
 # Table generation
@@ -304,7 +311,7 @@ analyzer_recording2_entry.insert(0, "Enter second residual.")
 analyzer_recording2_entry.bind('<FocusIn>', lambda x: analyzer_recording2_entry.selection_range(0, tk.END))
 analyzer_recording2_entry.pack()
 
-analyzer_submit_button = tk.Button(text="Push Analyzer", command=lambda: write_analyzer(analyzer_menu))
+analyzer_submit_button = tk.Button(text="Push Analyzer", command=lambda: [write_analyzer(analyzer_menu), daily_completed()])
 analyzer_submit_button.pack()
 
 finalize_button = tk.Button(text="Finalize", command=submit_analyzers, state="disabled")
