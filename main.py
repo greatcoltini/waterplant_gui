@@ -36,11 +36,16 @@ def determine_analyzers():
             # if date is equal to current date, remove analyzer option
             if analyzer_date == current_time[:-1] and analyzer_in_database == analyzer:
                 delete_analyzer(analyzer)
+
     if not PLANT_ANALYZERS:
         finalize_button.destroy()
         analyzer_page.remove(finalize_button)
+        main_residual_btn.config(text="Daily Analyzers Done...", state="disabled")
         exhausted_push()
-
+    else:
+        counter = 3 - len(PLANT_ANALYZERS)
+        main_residual_btn_text = "Daily Analyzers Done: (" + str(counter) + "/3)"
+        main_residual_btn.config(text=main_residual_btn_text, state="enabled", command=lambda: change_state(1))
 
 # Submit the analyzer information to a file
 def submit_analyzers():
@@ -193,6 +198,7 @@ def change_state(event):
         table_generation()
 
 
+
 # Controls the state of the required page
 def state_switch(state, page):
     if state:
@@ -201,6 +207,7 @@ def state_switch(state, page):
     else:
         for item in page:
             item.pack()
+
 
 # Table generation
 # OPENS THE GENERATED PLANT FILE FOR ANALYZERS
@@ -262,8 +269,8 @@ nav_menu.add_command(
     command=lambda: change_state(3)
 )
 nav_menu.add_command(
-    label="Help",
-    command=lambda: change_state(0)
+    label="Main Page",
+    command=lambda: change_state(5)
 )
 nav_menu.add_command(
     label="Exit",
@@ -330,6 +337,19 @@ residual_push_button = tk.Button(residuals_frame, text="Submit Residual", comman
 previous_residual_button = tk.Button(residuals_frame, text="Residuals Table", command=lambda: change_state(4))
 
 
+# creation of main page...
+main_frame1 = ttk.Frame(window)
+
+# grid layout
+main_frame1.columnconfigure(0, weight=1)
+main_frame1.columnconfigure(0, weight=5)
+main_label = ttk.Label(main_frame1, text="Main Page.")
+main_residual_btn = ttk.Button(main_frame1, text="Daily Residuals")
+main_plant_walkthru = ttk.Button(main_frame1, text="Plant Walkthrough")
+main_uv_anal = ttk.Button(main_frame1, text="UV Analyzers")
+main_checks = ttk.Button(main_frame1, text="Locational Residuals")
+
+
 # components for residual history page
 residual_table = ttk.Treeview(window)
 
@@ -373,6 +393,14 @@ previous_residuals_page = [
     back_button
 ]
 
+main_page = [
+    main_frame1,
+    main_label,
+    main_residual_btn,
+    main_plant_walkthru,
+    main_uv_anal,
+    main_checks
+]
 
 # container of all containers
 pages = [
@@ -380,7 +408,8 @@ pages = [
     analyzer_page,
     analyzer_previous_page,
     residuals_page,
-    previous_residuals_page
+    previous_residuals_page,
+    main_page
 ]
 
 
