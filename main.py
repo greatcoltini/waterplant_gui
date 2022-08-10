@@ -17,7 +17,7 @@ GUI_STATE = [
     "uv"
 ]
 
-CURRENT_STATE = 0;
+CURRENT_STATE = ""
 
 
 # Function to determine if we have done our daily analyzer checks yet..
@@ -173,14 +173,20 @@ def change_analyzer(event):
 
 
 # Reverts the state when the back button is pressed
-def back_button():
-    if pages
+def return_previous_page():
+    if CURRENT_STATE == analyzer_previous_page:
+        change_state(1)
+    elif CURRENT_STATE == previous_residuals_page:
+        change_state(3)
+
 
 # Command that changes the states upon button press
 def change_state(event):
     for page in pages:
         state_switch(True, page)
     state_switch(False, pages[event])
+
+    global CURRENT_STATE
     CURRENT_STATE = pages[event]
 
     if event == 2:
@@ -309,7 +315,7 @@ display_previous_recordings.pack()
 
 # components for analyzer history page
 analyzer_table = ttk.Treeview(window)
-back_button = tk.Button(text="Back", command=lambda: change_state(1))
+back_button = tk.Button(text="Back", command=lambda: return_previous_page())
 
 # components for residual page
 residuals_frame = tk.Frame(window)
