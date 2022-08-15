@@ -354,7 +354,7 @@ main_label = ttk.Label(main_frame1, text="Main Page.")
 main_residual_btn = ttk.Button(main_frame1, text="Daily Residuals")
 main_plant_walkthru = ttk.Button(main_frame1, text="Plant Walkthrough")
 main_uv_anal = ttk.Button(main_frame1, text="UV Analyzers")
-main_checks = ttk.Button(main_frame1, text="Locational Residuals")
+main_checks = ttk.Button(main_frame1, text="Locational Residuals", command=lambda: change_state(3))
 
 
 # components for residual history page
@@ -423,6 +423,7 @@ pages = [
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     determine_analyzers()
+    change_state(5)
     window.mainloop()
 
 
