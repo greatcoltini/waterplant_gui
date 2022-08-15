@@ -196,7 +196,7 @@ def change_state(event):
     CURRENT_STATE = pages[event]
 
     if event == 2:
-        table_generation()
+        analyzer_table_generation()
 
 
 # Controls the state of the required page
@@ -220,7 +220,7 @@ def daily_completed():
 # OPENS THE GENERATED PLANT FILE FOR ANALYZERS
 # READS THEM INTO A TABLE BASED ON DATE
 # COLUMN FOR DATE | ANALYZER NAME | READING | RESIDUAL 1 | RESIDUAL 2
-def table_generation():
+def analyzer_table_generation():
     # necessary to refresh table
     analyzer_table.delete(*analyzer_table.get_children())
 
@@ -254,6 +254,13 @@ def table_generation():
     analyzer_data.close()
 
 
+# table generation for residual data
+# TODO
+def residual_table_generation():
+    pass
+
+
+
 # Generation of the GUI for the water plant
 window = tk.Tk()
 window.title("Water Plant GUI")
@@ -284,8 +291,7 @@ nav_menu.add_command(
     command=window.destroy
 )
 
-opening_label = tk.Label(text="Welcome to your Plant Operations GUI")
-opening_label.pack()
+
 
 analyzer_label = tk.Label(text="Enter your analyzer information here.")
 analyzer_label.pack()
