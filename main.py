@@ -350,7 +350,7 @@ main_frame1 = ttk.Frame(window)
 # grid layout
 main_frame1.columnconfigure(0, weight=1)
 main_frame1.columnconfigure(0, weight=5)
-main_label = ttk.Label(main_frame1, text="Main Page.")
+main_label = tk.Label(main_frame1, text="Main Page", borderwidth=4, relief="groove", height=5, width=20)
 main_residual_btn = ttk.Button(main_frame1, text="Daily Residuals")
 main_plant_walkthru = ttk.Button(main_frame1, text="Plant Walkthrough")
 main_uv_anal = ttk.Button(main_frame1, text="UV Analyzers")
