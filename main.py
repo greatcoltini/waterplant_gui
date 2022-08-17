@@ -1,8 +1,79 @@
 import datetime
 import tkinter as tk
+from functools import partial
 from tkinter import ttk
 import time
 import re
+
+
+class MyTreeview(ttk.Treeview):
+    def heading(self, column, sort_by=None, **kwargs):
+        if sort_by and not hasattr(kwargs, 'command'):
+            func = getattr(self, f"_sort_by_{sort_by}", None)
+            if func:
+                kwargs['command'] = partial(func, column, False)
+            # End of if
+        # End of if
+        return super().heading(column, **kwargs)
+
+    # End of heading()
+
+    def _sort(self, column, reverse, data_type, callback):
+        l = [(self.set(k, column), k) for k in self.get_children('')]
+        l.sort(key=lambda t: data_type(t[0]), reverse=reverse)
+        for index, (_, k) in enumerate(l):
+            self.move(k, '', index)
+        # End of for loop
+        self.heading(column, command=partial(callback, column, not reverse))
+
+    # End of _sort()
+
+    def _sort_by_num(self, column, reverse):
+        self._sort(column, reverse, int, self._sort_by_num)
+
+    # End of _sort_by_num()
+
+    def _sort_by_name(self, column, reverse):
+        self._sort(column, reverse, str, self._sort_by_name)
+
+    # End of _sort_by_num()
+
+    def _sort_by_date(self, column, reverse):
+        def _str_to_datetime(string):
+            return datetime.datetime.strptime(string, "%Y/%m/%d")
+
+        # End of _str_to_datetime()
+
+        self._sort(column, reverse, _str_to_datetime, self._sort_by_date)
+
+    # End of _sort_by_num()
+
+    def _sort_by_multidecimal(self, column, reverse):
+        def _multidecimal_to_str(string):
+            arrString = string.split(".")
+            strNum = ""
+            for iValue in arrString:
+                strValue = f"{int(iValue):02}"
+                strNum = "".join([strNum, str(strValue)])
+            # End of for loop
+            strNum = "".join([strNum, "0000000"])
+            return int(strNum[:8])
+
+        # End of _multidecimal_to_str()
+
+        self._sort(column, reverse, _multidecimal_to_str, self._sort_by_multidecimal)
+
+    # End of _sort_by_num()
+
+    def _sort_by_numcomma(self, column, reverse):
+        def _numcomma_to_num(string):
+            return int(string.replace(",", ""))
+
+        # End of _numcomma_to_num()
+
+        self._sort(column, reverse, _numcomma_to_num, self._sort_by_numcomma)
+    # End of _sort_by_num()
+
 
 plant_file = open("plant_database.pf", "a")
 
@@ -150,7 +221,36 @@ def submit_residual():
 
 # display previous residuals
 def previous_residuals():
-    pass
+    # necessary to refresh table
+    pr_table.delete(*pr_table.get_children())
+
+    pr_data = open("residuals.txt", "r")
+    pr_table['columns'] = ('Date', 'Location', 'Time', 'Residual')
+
+    # format our column
+    pr_table.column("#0", width=0, stretch=tk.NO)
+    pr_table.column("Date", anchor=tk.CENTER, width=80)
+    pr_table.column("Location", anchor=tk.CENTER, width=80)
+    pr_table.column("Time", anchor=tk.CENTER, width=80)
+    pr_table.column("Residual", anchor=tk.CENTER, width=80)
+
+    # Create Headings
+    pr_table.heading("#0", text="", anchor=tk.CENTER)
+    pr_table.heading("Date", text="Date", anchor=tk.CENTER, sort_by='date')
+    pr_table.heading("Location", text="Location", anchor=tk.CENTER, sort_by='name')
+    pr_table.heading("Time", text="Time", anchor=tk.CENTER)
+    pr_table.heading("Residual", text="Residual", anchor=tk.CENTER, sort_by='multidecimal')
+
+    counter = 0
+    for line in pr_data:
+        section = line.split("\t")
+        pr_table.insert(parent='', index='end', iid=str(counter), text='',
+                              values=(section[0], section[1], section[2],
+                                      section[3]))
+        counter += 1
+
+    pr_table.pack()
+    pr_data.close()
 
 
 # get time and return it in format for writing
@@ -237,11 +337,11 @@ def analyzer_table_generation():
 
     # Create Headings
     analyzer_table.heading("#0", text="", anchor=tk.CENTER)
-    analyzer_table.heading("Date", text="Date", anchor=tk.CENTER)
-    analyzer_table.heading("Analyzer", text="Analyzer", anchor=tk.CENTER)
-    analyzer_table.heading("Reading", text="Reading", anchor=tk.CENTER)
-    analyzer_table.heading("Residual 1", text="Residual 1", anchor=tk.CENTER)
-    analyzer_table.heading("Residual 2", text="Residual 2", anchor=tk.CENTER)
+    analyzer_table.heading("Date", text="Date", anchor=tk.CENTER, sort_by='date')
+    analyzer_table.heading("Analyzer", text="Analyzer", anchor=tk.CENTER, sort_by='name')
+    analyzer_table.heading("Reading", text="Reading", anchor=tk.CENTER, sort_by='multidecimal')
+    analyzer_table.heading("Residual 1", text="Residual 1", anchor=tk.CENTER, sort_by='multidecimal')
+    analyzer_table.heading("Residual 2", text="Residual 2", anchor=tk.CENTER, sort_by='multidecimal')
 
     counter = 0
     for line in analyzer_data:
@@ -334,7 +434,7 @@ display_previous_recordings.pack()
 
 
 # components for analyzer history page
-analyzer_table = ttk.Treeview(window)
+analyzer_table = MyTreeview(window)
 back_button = tk.Button(text="Back", command=lambda: return_previous_page())
 
 # components for residual page
@@ -347,7 +447,8 @@ residual_time_label = tk.Label(residuals_frame, text="Time:")
 residual_value_entry = tk.Entry(residuals_frame, selectborderwidth=2, width=30, justify="center")
 residual_value_label = tk.Label(residuals_frame, text="Residual:")
 residual_push_button = tk.Button(residuals_frame, text="Submit Residual", command=lambda: submit_residual())
-previous_residual_button = tk.Button(residuals_frame, text="Residuals Table", command=lambda: change_state(4))
+previous_residual_button = tk.Button(residuals_frame, text="Residuals Table", command=lambda:
+                                                                        [change_state(4), previous_residuals()])
 
 
 # creation of main page...
@@ -364,7 +465,7 @@ main_checks = ttk.Button(main_frame1, text="Locational Residuals", command=lambd
 
 
 # components for residual history page
-residual_table = ttk.Treeview(window)
+pr_table = MyTreeview(window)
 
 # Container of all analyzer page elements
 analyzer_page = [
@@ -403,6 +504,7 @@ residuals_page = [
 ]
 
 previous_residuals_page = [
+    pr_table,
     back_button
 ]
 
