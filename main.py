@@ -88,6 +88,16 @@ GUI_STATE = [
     "uv"
 ]
 
+WEEKLY_SAMPLES = [
+    "Plant Tap",
+    "Public Tap",
+    "Building Maintenance",
+    "Water Tower",
+    "Seneca Sample Station",
+    "Cayuga Sample Station",
+    "Chiefswood Sample Station"
+]
+
 CURRENT_STATE = ""
 
 
@@ -358,7 +368,6 @@ def analyzer_table_generation():
 # TODO
 def residual_table_generation():
     pass
-
 
 
 # Generation of the GUI for the water plant
