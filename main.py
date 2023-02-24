@@ -459,6 +459,16 @@ residual_push_button = tk.Button(residuals_frame, text="Submit Residual", comman
 previous_residual_button = tk.Button(residuals_frame, text="Residuals Table", command=lambda:
                                                                         [change_state(4), previous_residuals()])
 
+# components for uv lamp page
+uv_frame = tk.Frame(window)
+uv_lamp_reactor_entry =  tk.Entry(uv_frame, selectborderwidth=2, width=30, justify="center")
+uv_lamp_entry = tk.Entry(uv_frame, selectborderwidth=2, width=30, justify="center")
+uv_lamp_serialnumber_entry = tk.Entry(uv_frame, selectborderwidth=2, width=30, justify="center")
+uv_lamp_product_date_entry = tk.Entry(uv_frame, selectborderwidth=2, width=30, justify="center")
+uv_lamp_net_hours_entry = tk.Entry(uv_frame, selectborderwidth=2, width=30, justify="center")
+uv_lamp_net_cycles_entry = tk.Entry(uv_frame, selectborderwidth=2, width=30, justify="center")
+lamps_table = MyTreeview(window)
+
 
 # creation of main page...
 main_frame1 = ttk.Frame(window)
@@ -469,7 +479,7 @@ main_frame1.columnconfigure(0, weight=5)
 main_label = tk.Label(main_frame1, text="Main Page", borderwidth=4, relief="groove", height=5, width=20)
 main_residual_btn = ttk.Button(main_frame1, text="Daily Residuals")
 main_plant_walkthru = ttk.Button(main_frame1, text="Plant Walkthrough")
-main_uv_anal = ttk.Button(main_frame1, text="UV Analyzers")
+main_uv_anal = ttk.Button(main_frame1, text="UV Analyzers", command=lambda: change_state(0))
 main_checks = ttk.Button(main_frame1, text="Locational Residuals", command=lambda: change_state(3))
 
 
@@ -496,7 +506,14 @@ analyzer_previous_page = [
 ]
 
 uv_page = [
-
+    uv_frame,
+    uv_lamp_reactor_entry,
+    uv_lamp_entry,
+    uv_lamp_serialnumber_entry,
+    uv_lamp_product_date_entry,
+    uv_lamp_net_hours_entry,
+    uv_lamp_net_cycles_entry,
+    lamps_table
 ]
 
 residuals_page = [
