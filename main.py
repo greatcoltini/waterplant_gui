@@ -2,6 +2,7 @@ import datetime
 import tkinter as tk
 from functools import partial
 from tkinter import ttk
+from components import *
 import time
 import re
 
@@ -461,13 +462,16 @@ previous_residual_button = tk.Button(residuals_frame, text="Residuals Table", co
 
 # components for uv lamp page
 uv_frame = tk.Frame(window)
-uv_lamp_reactor_entry =  tk.Entry(uv_frame, selectborderwidth=2, width=30, justify="center")
-uv_lamp_entry = tk.Entry(uv_frame, selectborderwidth=2, width=30, justify="center")
-uv_lamp_serialnumber_entry = tk.Entry(uv_frame, selectborderwidth=2, width=30, justify="center")
-uv_lamp_product_date_entry = tk.Entry(uv_frame, selectborderwidth=2, width=30, justify="center")
-uv_lamp_net_hours_entry = tk.Entry(uv_frame, selectborderwidth=2, width=30, justify="center")
-uv_lamp_net_cycles_entry = tk.Entry(uv_frame, selectborderwidth=2, width=30, justify="center")
+uv_lamp_reactor_entry = Labelled_Lamp_Entry(uv_frame, "Reactor #")
+uv_lamp_entry = Labelled_Lamp_Entry(uv_frame, "Lamp #")
+uv_lamp_serialnumber_entry = Labelled_Lamp_Entry(uv_frame, "Lamp Serial #")
+uv_lamp_product_date_entry = Labelled_Lamp_Entry(uv_frame, "Lamp Product Date")
+uv_lamp_net_hours_entry = Labelled_Lamp_Entry(uv_frame, "Lamp Net Hours")
+uv_lamp_net_cycles_entry = Labelled_Lamp_Entry(uv_frame, "Lamp Net Cycles")
 lamps_table = MyTreeview(window)
+
+
+
 
 
 # creation of main page...
