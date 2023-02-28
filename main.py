@@ -3,6 +3,7 @@ import tkinter as tk
 from functools import partial
 from tkinter import ttk
 from components import *
+from table_gen import *
 import time
 import re
 
@@ -77,6 +78,7 @@ class MyTreeview(ttk.Treeview):
 
 
 plant_file = open("plant_database.pf", "a")
+lamp_file = open("lamp_database.pf", "a")
 
 PLANT_ANALYZERS = [
     "UV-AIT3",
@@ -183,7 +185,23 @@ def write_analyzer(menu):
         change_state(1)
     else:
         pass
-
+    
+# method for submitting lamp
+def write_lamp_data():
+    # check for proper entry
+    proper_lamp = True
+    
+    lamp_info = [uv_lamp_reactor_entry, uv_lamp_entry, uv_lamp_serialnumber_entry, uv_lamp_product_date_entry,
+                 uv_lamp_net_hours_entry, uv_lamp_net_cycles_entry]
+    
+    if proper_lamp:
+        lamp_str = ""
+        for entry in lamp_info:
+            lamp_str += entry.get() + "\t"
+        lamp_file.write(lamp_str + "\n")
+        
+        for entry in lamp_info:
+            entry.delete(0, tk.END)
 
 # Delete analyzer function
 def delete_analyzer(analyzer):
@@ -308,6 +326,9 @@ def change_state(event):
 
     if event == 2:
         analyzer_table_generation()
+        
+    if event == 6:
+        lamp_table_generation(lamps_table)
 
 
 # Controls the state of the required page
@@ -468,7 +489,12 @@ uv_lamp_serialnumber_entry = Labelled_Lamp_Entry(uv_frame, "Lamp Serial #")
 uv_lamp_product_date_entry = Labelled_Lamp_Entry(uv_frame, "Lamp Product Date")
 uv_lamp_net_hours_entry = Labelled_Lamp_Entry(uv_frame, "Lamp Net Hours")
 uv_lamp_net_cycles_entry = Labelled_Lamp_Entry(uv_frame, "Lamp Net Cycles")
+uv_lamp_submit = tk.Button(uv_frame, text="Submit Lamp", command=lambda: write_lamp_data())
+uv_lamps_table_btn = tk.Button(uv_frame, text="Go To Lamps", command=lambda: change_state(6))
+
+# components for lamp history page
 lamps_table = MyTreeview(window)
+
 
 
 
@@ -517,7 +543,13 @@ uv_page = [
     uv_lamp_product_date_entry,
     uv_lamp_net_hours_entry,
     uv_lamp_net_cycles_entry,
-    lamps_table
+    uv_lamp_submit,
+    uv_lamps_table_btn
+]
+
+lamp_history_page = [
+    lamps_table,
+    back_button
 ]
 
 residuals_page = [
@@ -554,7 +586,8 @@ pages = [
     analyzer_previous_page,
     residuals_page,
     previous_residuals_page,
-    main_page
+    main_page,
+    lamp_history_page
 ]
 
 
